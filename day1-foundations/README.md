@@ -349,23 +349,61 @@ AWS Availability Zones (AZs) are physically separate data centers. If one catche
 **Step 2: Verify Your VPC**
 
 ```bash
-# List your VPCs
-aws ec2 describe-vpcs --query 'Vpcs[?Tags[?Key==`Name` && Value==`sockshop-vpc`]]'
+# List your VPCs (using filter for better results)
+aws ec2 describe-vpcs \
+  --filters "Name=tag:Name,Values=sockshop-vpc" \
+  --query 'Vpcs[*].[VpcId,CidrBlock,State,Tags[?Key==`Name`].Value|[0]]' \
+  --output table
 ```
 
 You should see your VPC with CIDR block `10.0.0.0/16`.
 
+**Alternative: Get VPC ID only**
+```bash
+# Get just the VPC ID
+aws ec2 describe-vpcs \
+  --filters "Name=tag:Name,Values=sockshop-vpc" \
+  --query 'Vpcs[0].VpcId' \
+  --output text
+```
+
 **Step 3: Check Your Subnets**
 
+First, get your VPC ID, then list subnets in that VPC:
+
 ```bash
-# List subnets in your VPC
+# Method 1: Get VPC ID first, then list subnets
+VPC_ID=$(aws ec2 describe-vpcs \
+  --filters "Name=tag:Name,Values=sockshop-vpc" \
+  --query 'Vpcs[0].VpcId' \
+  --output text)
+
+# List all subnets in your VPC
 aws ec2 describe-subnets \
-  --filters "Name=tag:Name,Values=sockshop-vpc*" \
+  --filters "Name=vpc-id,Values=$VPC_ID" \
+  --query 'Subnets[*].[SubnetId,CidrBlock,AvailabilityZone,MapPublicIpOnLaunch,Tags[?Key==`Name`].Value|[0]]' \
+  --output table
+```
+
+**Method 2: One-liner (if you know the VPC ID)**
+```bash
+# Replace vpc-xxxxx with your actual VPC ID
+aws ec2 describe-subnets \
+  --filters "Name=vpc-id,Values=vpc-xxxxx" \
   --query 'Subnets[*].[SubnetId,CidrBlock,AvailabilityZone,Tags[?Key==`Name`].Value|[0]]' \
   --output table
 ```
 
-You should see 4 subnets across 2 availability zones.
+**Method 3: Filter by subnet name pattern (if subnets are tagged)**
+```bash
+# List subnets with names containing "sockshop-vpc"
+aws ec2 describe-subnets \
+  --filters "Name=tag:Name,Values=sockshop-vpc-*" \
+  --query 'Subnets[*].[SubnetId,CidrBlock,AvailabilityZone,Tags[?Key==`Name`].Value|[0]]' \
+  --output table
+```
+
+You should see 4 subnets across 2 availability zones (2 public, 2 private).
 
 ### Understanding Security Groups (Your Firewall)
 

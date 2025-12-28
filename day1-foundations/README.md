@@ -476,8 +476,18 @@ Now for the main event:
 1. In EC2 Console, click "Launch Instance"
 2. Name: `sockshop-app-server`
 3. **Application and OS Images (Amazon Machine Image)**:
+   
+   **Option A: Ubuntu 22.04 LTS (RECOMMENDED - More Reliable)**
+   - Search for "Ubuntu"
+   - Choose "Ubuntu Server 22.04 LTS (HVM), SSD Volume Type"
+   - Architecture: 64-bit (x86)
+   - **Username for SSH**: `ubuntu` (not ec2-user!)
+   
+   **Option B: Amazon Linux 2023**
    - Choose "Amazon Linux 2023 AMI"
    - Architecture: 64-bit (x86)
+   - **Username for SSH**: `ec2-user`
+   
 4. **Instance Type**:
    - Choose `t2.micro` (Free Tier eligible - you'll see a green label)
 5. **Key pair**:
@@ -485,19 +495,48 @@ Now for the main event:
 6. **Network settings** - Click Edit:
    - VPC: `sockshop-vpc`
    - Subnet: Choose one of your PUBLIC subnets (e.g., `sockshop-vpc-subnet-public1-us-east-1a`)
-   - Auto-assign public IP: Enable
+   - Auto-assign public IP: **Enable** (CRITICAL - must be enabled!)
    - Firewall (security groups): Select existing security group
    - Select: `sockshop-ec2-sg`
 7. **Configure storage**:
    - 8 GB gp3 (default is fine, within Free Tier)
 8. **Advanced details** - Expand this:
    - Scroll to "User data" (at the bottom)
-   - Paste this script:
+   - Paste the appropriate script below:
 
+**For Ubuntu (Option A - RECOMMENDED):**
 ```bash
 #!/bin/bash
 # Update system
-yum update -y
+apt-get update -y
+apt-get upgrade -y
+
+# Install Docker
+apt-get install -y docker.io
+systemctl start docker
+systemctl enable docker
+
+# Add ubuntu user to docker group
+usermod -aG docker ubuntu
+
+# Install Docker Compose
+curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+# Install git
+apt-get install -y git
+
+# Log completion
+echo "User data script completed" > /tmp/user-data-complete.txt
+```
+
+**For Amazon Linux 2023 (Option B):**
+```bash
+#!/bin/bash
+# Update system (with retry logic for network issues)
+for i in {1..5}; do
+    yum update -y && break || sleep 10
+done
 
 # Install Docker
 yum install -y docker
@@ -520,6 +559,63 @@ echo "User data script completed" > /tmp/user-data-complete.txt
 
 9. **Summary**: Review everything
 10. Click "Launch instance"
+
+**Troubleshooting: If User Data Script Fails (Network Timeout Errors)**
+
+If you see timeout errors when the instance tries to download packages, check these:
+
+1. **Verify Public Subnet Configuration:**
+   ```bash
+   # Get your VPC ID
+   VPC_ID=$(aws ec2 describe-vpcs --filters "Name=tag:Name,Values=sockshop-vpc" --query 'Vpcs[0].VpcId' --output text)
+   
+   # Check route table for public subnets
+   aws ec2 describe-route-tables \
+     --filters "Name=vpc-id,Values=$VPC_ID" \
+     --query 'RouteTables[*].[RouteTableId,Associations[0].SubnetId,Routes[?GatewayId!=null].GatewayId|[0]]' \
+     --output table
+   ```
+   The public subnet route table should have a route to an Internet Gateway (igw-xxxxx).
+
+2. **Verify Internet Gateway is Attached:**
+   ```bash
+   aws ec2 describe-internet-gateways \
+     --filters "Name=attachment.vpc-id,Values=$VPC_ID" \
+     --query 'InternetGateways[*].[InternetGatewayId,Attachments[0].State]' \
+     --output table
+   ```
+   Should show "available" state.
+
+3. **Check Security Group Outbound Rules:**
+   - Go to EC2 Console → Security Groups → `sockshop-ec2-sg`
+   - Outbound rules should allow "All traffic" to "0.0.0.0/0"
+
+4. **Manual Fix After Instance Launch:**
+   If the user data script failed, SSH into the instance and run the installation manually:
+   
+   **For Ubuntu:**
+   ```bash
+   ssh -i ~/Downloads/sockshop-key.pem ubuntu@YOUR_PUBLIC_IP
+   sudo apt-get update -y
+   sudo apt-get install -y docker.io git
+   sudo systemctl start docker
+   sudo systemctl enable docker
+   sudo usermod -aG docker ubuntu
+   sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   sudo chmod +x /usr/local/bin/docker-compose
+   ```
+   
+   **For Amazon Linux:**
+   ```bash
+   ssh -i ~/Downloads/sockshop-key.pem ec2-user@YOUR_PUBLIC_IP
+   sudo yum update -y
+   sudo yum install -y docker git
+   sudo systemctl start docker
+   sudo systemctl enable docker
+   sudo usermod -aG docker ec2-user
+   sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+   sudo chmod +x /usr/local/bin/docker-compose
+   ```
 
 **What Just Happened?**
 
@@ -544,6 +640,15 @@ This takes 2-3 minutes.
 
 **Step 5: SSH Into Your Instance**
 
+**Important: Username depends on your AMI choice!**
+
+**For Ubuntu:**
+```bash
+# Replace with your actual IP and key path
+ssh -i ~/Downloads/sockshop-key.pem ubuntu@54.123.45.67
+```
+
+**For Amazon Linux:**
 ```bash
 # Replace with your actual IP and key path
 ssh -i ~/Downloads/sockshop-key.pem ec2-user@54.123.45.67
@@ -551,7 +656,14 @@ ssh -i ~/Downloads/sockshop-key.pem ec2-user@54.123.45.67
 
 If you see a warning about authenticity, type `yes`.
 
-You should see:
+**For Ubuntu, you should see:**
+```
+Welcome to Ubuntu 22.04.3 LTS (GNU/Linux ...)
+...
+ubuntu@ip-10-0-1-123:~$
+```
+
+**For Amazon Linux, you should see:**
 ```
    ,     #_
    ~\_  ####_        Amazon Linux 2023
@@ -832,6 +944,17 @@ Once the database status is "Available":
 
 SSH back into your EC2 instance:
 
+**For Ubuntu:**
+```bash
+# Install MySQL client
+sudo apt-get update -y
+sudo apt-get install -y mysql-client
+
+# Connect to RDS (replace with your endpoint and password)
+mysql -h sockshop-db.abc123def456.us-east-1.rds.amazonaws.com -u admin -p
+```
+
+**For Amazon Linux:**
 ```bash
 # Install MySQL client
 sudo yum install -y mysql

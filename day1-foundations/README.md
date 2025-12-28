@@ -502,7 +502,10 @@ Now for the main event:
    - 8 GB gp3 (default is fine, within Free Tier)
 8. **Advanced details** - Expand this:
    - Scroll to "User data" (at the bottom)
-   - Paste the appropriate script below:
+   - **IMPORTANT**: Do NOT check "User data has already been base64 encoded" - leave it unchecked!
+   - The AWS Console automatically encodes plain text for you
+   - Only check that box if you're pasting pre-encoded base64 data (not needed here)
+   - Paste the appropriate script below (as plain text):
 
 **For Ubuntu (Option A - RECOMMENDED):**
 ```bash

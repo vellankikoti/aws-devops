@@ -378,6 +378,8 @@ VPC_ID=$(aws ec2 describe-vpcs \
   --query 'Vpcs[0].VpcId' \
   --output text)
 
+echo "VPC ID: $VPC_ID"
+
 # List all subnets in your VPC
 aws ec2 describe-subnets \
   --filters "Name=vpc-id,Values=$VPC_ID" \
@@ -390,15 +392,6 @@ aws ec2 describe-subnets \
 # Replace vpc-xxxxx with your actual VPC ID
 aws ec2 describe-subnets \
   --filters "Name=vpc-id,Values=vpc-xxxxx" \
-  --query 'Subnets[*].[SubnetId,CidrBlock,AvailabilityZone,Tags[?Key==`Name`].Value|[0]]' \
-  --output table
-```
-
-**Method 3: Filter by subnet name pattern (if subnets are tagged)**
-```bash
-# List subnets with names containing "sockshop-vpc"
-aws ec2 describe-subnets \
-  --filters "Name=tag:Name,Values=sockshop-vpc-*" \
   --query 'Subnets[*].[SubnetId,CidrBlock,AvailabilityZone,Tags[?Key==`Name`].Value|[0]]' \
   --output table
 ```

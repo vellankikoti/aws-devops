@@ -1,0 +1,5 @@
+---
+# Database-specific variables (for self-managed DBs)
+server_role: database
+db_port: 3306
+db_name: socksdb

@@ -1,0 +1,131 @@
+// =============================================================================
+// Sock Shop CI/CD Pipeline
+// =============================================================================
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'ENVIRONMENT', choices: ['dev', 'staging', 'prod'], description: 'Target environment')
+        booleanParam(name: 'SKIP_TERRAFORM', defaultValue: false, description: 'Skip infrastructure changes')
+        booleanParam(name: 'ROLLBACK', defaultValue: false, description: 'Rollback to previous version')
+        string(name: 'APP_VERSION', defaultValue: 'latest', description: 'Application version to deploy')
+    }
+
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+        PROJECT_NAME      = 'sockshop'
+        TF_DIR            = 'day2-terraform/environments'
+        ANSIBLE_DIR       = 'day3-ansible'
+    }
+
+    options {
+        timeout(time: 30, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                echo "Building ${params.ENVIRONMENT} environment, version: ${params.APP_VERSION}"
+            }
+        }
+
+        stage('Terraform Plan') {
+            when { not { expression { params.SKIP_TERRAFORM } } }
+            steps {
+                dir("${TF_DIR}/${params.ENVIRONMENT}") {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                     credentialsId: 'aws-credentials']]) {
+                        sh 'terraform init -no-color'
+                        sh 'terraform plan -no-color -out=tfplan'
+                    }
+                }
+            }
+        }
+
+        stage('Approval') {
+            when {
+                allOf {
+                    expression { params.ENVIRONMENT == 'prod' }
+                    not { expression { params.SKIP_TERRAFORM } }
+                }
+            }
+            steps {
+                input message: "Deploy to PRODUCTION?", ok: "Yes, deploy to prod"
+            }
+        }
+
+        stage('Terraform Apply') {
+            when { not { expression { params.SKIP_TERRAFORM } } }
+            steps {
+                dir("${TF_DIR}/${params.ENVIRONMENT}") {
+                    withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
+                                     credentialsId: 'aws-credentials']]) {
+                        sh 'terraform apply -no-color -auto-approve tfplan'
+                    }
+                }
+            }
+        }
+
+        stage('Ansible Configure') {
+            steps {
+                dir("${ANSIBLE_DIR}") {
+                    withCredentials([sshUserPrivateKey(credentialsId: 'ec2-ssh-key',
+                                                       keyFileVariable: 'SSH_KEY')]) {
+                        sh """
+                            export ANSIBLE_PRIVATE_KEY_FILE=\${SSH_KEY}
+                            ansible-playbook -i inventory/aws_ec2.yml playbooks/site.yml \
+                                --extra-vars "environment=${params.ENVIRONMENT}"
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                script {
+                    def maxRetries = 10
+                    def retryCount = 0
+                    def healthy = false
+
+                    while (retryCount < maxRetries && !healthy) {
+                        try {
+                            def response = sh(script: """
+                                curl -s -o /dev/null -w '%{http_code}' \
+                                    http://\$(terraform -chdir=${TF_DIR}/${params.ENVIRONMENT} output -raw alb_url) || echo '000'
+                            """, returnStdout: true).trim()
+
+                            if (response == '200') {
+                                healthy = true
+                                echo "Health check passed!"
+                            }
+                        } catch (Exception e) {
+                            echo "Health check attempt ${retryCount + 1} failed"
+                        }
+                        retryCount++
+                        if (!healthy) { sleep(15) }
+                    }
+
+                    if (!healthy) {
+                        error("Health check failed after ${maxRetries} attempts")
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Pipeline completed successfully for ${params.ENVIRONMENT}!"
+        }
+        failure {
+            echo "Pipeline FAILED for ${params.ENVIRONMENT}!"
+        }
+        always {
+            cleanWs()
+        }
+    }
+}

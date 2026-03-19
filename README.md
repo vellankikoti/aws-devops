@@ -84,7 +84,7 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$0.50/day (same infrastructure, now automated)
 
-👉 [Start Day 2](./day2-terraform/README.md) *(coming soon)*
+👉 [Start Day 2](./day2-terraform/README.md)
 
 ### Day 3: Configuration Management with Ansible
 **Theme:** Configure at Scale
@@ -106,8 +106,7 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$0.50/day
 
-👉 [Start Day 3](./day3-ansible/README.md) *(coming soon)*
-
+👉 [Start Day 3](./day3-ansible/README.md) 
 ### Day 4: CI/CD Pipeline with Jenkins
 **Theme:** Automate the Automation
 
@@ -128,8 +127,7 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$1.00/day (additional EC2 for Jenkins)
 
-👉 [Start Day 4](./day4-jenkins/README.md) *(coming soon)*
-
+👉 [Start Day 4](./day4-jenkins/README.md) 
 ### Day 5: Container Orchestration with ECS/EKS
 **Theme:** Kubernetes in the Cloud
 
@@ -150,8 +148,7 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$3.50/day (EKS control plane) OR $0 with ECS Fargate
 
-👉 [Start Day 5](./day5-kubernetes/README.md) *(coming soon)*
-
+👉 [Start Day 5](./day5-kubernetes/README.md) 
 ### Day 6: Observability Stack (Prometheus, Grafana, OpenTelemetry)
 **Theme:** See Everything, Know Everything
 
@@ -172,8 +169,7 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$3.50/day (same as Day 5)
 
-👉 [Start Day 6](./day6-observability/README.md) *(coming soon)*
-
+👉 [Start Day 6](./day6-observability/README.md) 
 ### Day 7: Production Readiness & Cost Optimization
 **Theme:** Making It Real
 
@@ -194,8 +190,7 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$3.50/day
 
-👉 [Start Day 7](./day7-production/README.md) *(coming soon)*
-
+👉 [Start Day 7](./day7-production/README.md) 
 ## Cost Breakdown
 
 ### Daily Costs (if running 24/7)

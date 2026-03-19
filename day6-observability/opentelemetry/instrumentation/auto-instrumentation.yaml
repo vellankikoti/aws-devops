@@ -1,0 +1,16 @@
+# OpenTelemetry auto-instrumentation for Kubernetes
+# Requires the OTel Operator: https://github.com/open-telemetry/opentelemetry-operator
+apiVersion: opentelemetry.io/v1alpha1
+kind: Instrumentation
+metadata:
+  name: sockshop-instrumentation
+  namespace: sock-shop
+spec:
+  exporter:
+    endpoint: http://otel-collector.monitoring:4317
+  propagators:
+    - tracecontext
+    - baggage
+  sampler:
+    type: parentbased_traceidratio
+    argument: "0.25"

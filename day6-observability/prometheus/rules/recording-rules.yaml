@@ -1,0 +1,9 @@
+groups:
+  - name: sockshop-recording-rules
+    rules:
+      - record: job:http_requests:rate5m
+        expr: sum(rate(http_requests_total[5m])) by (job)
+      - record: job:http_request_duration:p99
+        expr: histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, job))
+      - record: namespace:container_cpu:sum_rate
+        expr: sum(rate(container_cpu_usage_seconds_total{namespace="sock-shop"}[5m])) by (namespace)

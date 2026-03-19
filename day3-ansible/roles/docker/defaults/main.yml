@@ -1,0 +1,4 @@
+---
+docker_user: ec2-user
+install_docker_compose: true
+docker_compose_url: "https://github.com/docker/compose/releases/latest/download/docker-compose-Linux-x86_64"

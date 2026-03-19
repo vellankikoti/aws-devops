@@ -1,0 +1,61 @@
+---
+# =============================================================================
+# Playbook: Deploy Sock Shop Microservices
+# =============================================================================
+- name: Deploy Sock Shop Application
+  hosts: webservers
+  become: yes
+
+  vars:
+    app_dir: /opt/sockshop
+    sockshop_version: "0.3.12"
+
+  tasks:
+    - name: Create application directory
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: ec2-user
+        group: ec2-user
+        mode: '0755'
+
+    - name: Deploy docker-compose configuration
+      template:
+        src: ../roles/sockshop/templates/docker-compose.yml.j2
+        dest: "{{ app_dir }}/docker-compose.yml"
+        owner: ec2-user
+        group: ec2-user
+        mode: '0644'
+      notify: restart sockshop
+
+    - name: Pull Docker images
+      command: docker-compose pull
+      args:
+        chdir: "{{ app_dir }}"
+      changed_when: false
+
+    - name: Start Sock Shop services
+      command: docker-compose up -d
+      args:
+        chdir: "{{ app_dir }}"
+      register: compose_result
+      changed_when: "'Creating' in compose_result.stderr or 'Starting' in compose_result.stderr"
+
+    - name: Wait for application to be ready
+      uri:
+        url: "http://localhost:8079"
+        status_code: 200
+      register: result
+      until: result.status == 200
+      retries: 30
+      delay: 10
+
+    - name: Display application status
+      debug:
+        msg: "Sock Shop is running at http://{{ ansible_host }}:8079"
+
+  handlers:
+    - name: restart sockshop
+      command: docker-compose restart
+      args:
+        chdir: "{{ app_dir }}"

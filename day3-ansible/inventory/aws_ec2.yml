@@ -1,0 +1,32 @@
+# =============================================================================
+# Dynamic AWS EC2 Inventory
+# =============================================================================
+# Requires: pip install boto3 botocore
+# Requires: amazon.aws collection (ansible-galaxy collection install amazon.aws)
+
+plugin: amazon.aws.aws_ec2
+
+regions:
+  - us-east-1
+
+filters:
+  tag:Project: SockShop
+  instance-state-name: running
+
+keyed_groups:
+  - key: tags.Role
+    prefix: role
+    separator: "_"
+  - key: tags.Environment
+    prefix: env
+    separator: "_"
+  - key: placement.availability_zone
+    prefix: az
+
+compose:
+  ansible_host: public_ip_address
+  ansible_user: "'ec2-user'"
+
+hostnames:
+  - tag:Name
+  - instance-id

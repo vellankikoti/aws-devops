@@ -1,0 +1,32 @@
+---
+- name: Create Sock Shop directory
+  file:
+    path: "{{ sockshop_app_dir }}"
+    state: directory
+    owner: "{{ sockshop_user }}"
+    group: "{{ sockshop_user }}"
+    mode: '0755'
+
+- name: Deploy docker-compose.yml
+  template:
+    src: docker-compose.yml.j2
+    dest: "{{ sockshop_app_dir }}/docker-compose.yml"
+    owner: "{{ sockshop_user }}"
+    mode: '0644'
+  notify: restart sockshop
+
+- name: Start Sock Shop
+  command: docker-compose up -d
+  args:
+    chdir: "{{ sockshop_app_dir }}"
+  register: result
+  changed_when: "'Creating' in result.stderr"
+
+- name: Wait for Sock Shop to be healthy
+  uri:
+    url: "http://localhost:{{ sockshop_port }}"
+    status_code: 200
+  register: health
+  until: health.status == 200
+  retries: 30
+  delay: 10

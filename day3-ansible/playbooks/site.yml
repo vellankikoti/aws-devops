@@ -1,0 +1,20 @@
+---
+# =============================================================================
+# Master Playbook - Orchestrates All Configuration
+# =============================================================================
+# Usage: ansible-playbook playbooks/site.yml
+# Tags:  ansible-playbook playbooks/site.yml --tags docker
+#        ansible-playbook playbooks/site.yml --tags deploy
+#        ansible-playbook playbooks/site.yml --tags monitoring
+
+- name: Phase 1 - Install Docker
+  import_playbook: setup-docker.yml
+  tags: [docker, infrastructure]
+
+- name: Phase 2 - Deploy Application
+  import_playbook: deploy-sockshop.yml
+  tags: [deploy, application]
+
+- name: Phase 3 - Configure Monitoring
+  import_playbook: configure-monitoring.yml
+  tags: [monitoring, observability]

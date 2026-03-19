@@ -106,7 +106,8 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$0.50/day
 
-👉 [Start Day 3](./day3-ansible/README.md) 
+👉 [Start Day 3](./day3-ansible/README.md)
+
 ### Day 4: CI/CD Pipeline with Jenkins
 **Theme:** Automate the Automation
 
@@ -127,7 +128,8 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$1.00/day (additional EC2 for Jenkins)
 
-👉 [Start Day 4](./day4-jenkins/README.md) 
+👉 [Start Day 4](./day4-jenkins/README.md)
+
 ### Day 5: Container Orchestration with ECS/EKS
 **Theme:** Kubernetes in the Cloud
 
@@ -148,7 +150,8 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$3.50/day (EKS control plane) OR $0 with ECS Fargate
 
-👉 [Start Day 5](./day5-kubernetes/README.md) 
+👉 [Start Day 5](./day5-kubernetes/README.md)
+
 ### Day 6: Observability Stack (Prometheus, Grafana, OpenTelemetry)
 **Theme:** See Everything, Know Everything
 
@@ -169,7 +172,8 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$3.50/day (same as Day 5)
 
-👉 [Start Day 6](./day6-observability/README.md) 
+👉 [Start Day 6](./day6-observability/README.md)
+
 ### Day 7: Production Readiness & Cost Optimization
 **Theme:** Making It Real
 
@@ -190,7 +194,8 @@ I'm Koti, a DevOps Engineer at TransUnion managing 1000+ Kubernetes workloads ac
 **Time:** 7-8 hours
 **Cost:** ~$3.50/day
 
-👉 [Start Day 7](./day7-production/README.md) 
+👉 [Start Day 7](./day7-production/README.md)
+
 ## Cost Breakdown
 
 ### Daily Costs (if running 24/7)
@@ -261,10 +266,21 @@ We'll install Terraform, Ansible, Docker, kubectl as we need them.
 aws-devops-7days/
 ├── README.md                    # This file
 ├── day1-foundations/            # Day 1: Manual deployment
-│   ├── README.md               # Complete Day 1 guide
+│   ├── README.md               # Complete Day 1 guide (1800+ lines)
 │   ├── QUICK-REFERENCE.md      # Quick commands reference
-│   ├── manual-steps/           # Step-by-step guides
-│   ├── scripts/                # Helper scripts
+│   ├── manual-steps/           # Step-by-step guides (7 detailed docs)
+│   │   ├── 01-aws-account-setup.md
+│   │   ├── 02-vpc-setup.md
+│   │   ├── 03-ec2-setup.md
+│   │   ├── 04-sockshop-deployment.md
+│   │   ├── 05-rds-setup.md
+│   │   ├── 06-alb-setup.md
+│   │   └── 07-monitoring-setup.md
+│   ├── scripts/                # Helper & automation scripts
+│   │   ├── setup-day1.sh       # Automated infrastructure setup
+│   │   ├── verify-deployment.sh
+│   │   ├── check-costs.sh
+│   │   └── cleanup-day1.sh
 │   └── diagrams/               # Architecture diagrams
 ├── day2-terraform/             # Day 2: Terraform IaC
 ├── day3-ansible/               # Day 3: Ansible configuration

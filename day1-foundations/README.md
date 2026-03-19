@@ -1814,6 +1814,28 @@ You can deploy a production-grade (well, almost) multi-tier application on AWS. 
 
 Tomorrow, we make you dangerous with automation.
 
+## Detailed Step-by-Step Guides
+
+If you prefer following individual focused guides instead of this single README, we've broken each section into its own detailed document with extra CLI alternatives, troubleshooting, and verification steps:
+
+| # | Guide | What It Covers | Time |
+|---|-------|---------------|------|
+| 1 | [AWS Account Setup](./manual-steps/01-aws-account-setup.md) | Account creation, MFA, IAM user, CLI setup, billing alerts | 45-60 min |
+| 2 | [VPC & Networking](./manual-steps/02-vpc-setup.md) | VPC, subnets, Internet Gateway, route tables | 15-20 min |
+| 3 | [EC2 Instance](./manual-steps/03-ec2-setup.md) | Key pair, security group, instance launch, SSH | 20-30 min |
+| 4 | [Sock Shop Deployment](./manual-steps/04-sockshop-deployment.md) | Docker Compose, microservices, application testing | 20-30 min |
+| 5 | [RDS Database](./manual-steps/05-rds-setup.md) | DB subnet group, RDS MySQL, connectivity testing | 15-20 min |
+| 6 | [Load Balancer](./manual-steps/06-alb-setup.md) | Target group, ALB, listener, security tightening | 15-20 min |
+| 7 | [Monitoring](./manual-steps/07-monitoring-setup.md) | CloudWatch dashboard, alarms, cost monitoring, logs | 30-40 min |
+
+**Quick Setup Script**: If you've already completed Day 1 manually and want to quickly recreate the infrastructure (e.g., after cleanup), use the automated setup script:
+
+```bash
+./scripts/setup-day1.sh
+```
+
+This creates the entire Day 1 infrastructure via CLI in about 10 minutes. **Only use this after you've done it manually at least once** - the manual process is where the learning happens.
+
 ## Resources
 
 **AWS Documentation:**

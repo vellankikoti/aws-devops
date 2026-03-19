@@ -1,0 +1,11 @@
+{
+  "dashboard": {
+    "title": "Sock Shop Overview",
+    "panels": [
+      { "title": "Request Rate", "type": "timeseries", "targets": [{ "expr": "sum(rate(http_requests_total{namespace=\"sock-shop\"}[5m])) by (job)" }] },
+      { "title": "Error Rate", "type": "timeseries", "targets": [{ "expr": "sum(rate(http_requests_total{status=~\"5..\",namespace=\"sock-shop\"}[5m])) by (job)" }] },
+      { "title": "Latency P99", "type": "timeseries", "targets": [{ "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket{namespace=\"sock-shop\"}[5m])) by (le, job))" }] },
+      { "title": "Pod Count", "type": "stat", "targets": [{ "expr": "count(kube_pod_info{namespace=\"sock-shop\"})" }] }
+    ]
+  }
+}

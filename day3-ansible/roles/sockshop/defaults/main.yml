@@ -1,0 +1,6 @@
+---
+sockshop_app_dir: /opt/sockshop
+sockshop_user: ec2-user
+sockshop_port: 8079
+sockshop_frontend_version: "0.3.12"
+catalogue_db_password: "fake_password"

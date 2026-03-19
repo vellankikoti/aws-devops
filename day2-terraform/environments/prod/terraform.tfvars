@@ -1,0 +1,9 @@
+aws_region         = "us-east-1"
+project_name       = "sockshop"
+environment        = "prod"
+vpc_cidr           = "10.1.0.0/16"
+instance_type      = "t2.small"
+db_instance_class  = "db.t3.small"
+db_username        = "admin"
+db_password        = "ChangeMe456!Prod"
+allowed_ssh_cidrs  = []

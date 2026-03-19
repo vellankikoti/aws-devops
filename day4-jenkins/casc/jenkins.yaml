@@ -1,0 +1,26 @@
+# =============================================================================
+# Jenkins Configuration as Code (JCasC)
+# =============================================================================
+jenkins:
+  systemMessage: "Sock Shop CI/CD - Managed by JCasC"
+  numExecutors: 2
+  mode: NORMAL
+
+  securityRealm:
+    local:
+      allowsSignup: false
+
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+
+tool:
+  git:
+    installations:
+      - name: git
+        home: /usr/bin/git
+
+unclassified:
+  location:
+    url: "http://localhost:8080/"
+    adminAddress: "admin@sockshop.local"

@@ -1,0 +1,24 @@
+---
+# =============================================================================
+# Global Variables for All Hosts
+# =============================================================================
+project_name: sockshop
+environment: dev
+aws_region: us-east-1
+
+# Docker
+docker_user: ec2-user
+install_docker_compose: true
+
+# Application
+sockshop_port: 8079
+sockshop_app_dir: /opt/sockshop
+
+# Monitoring
+enable_cloudwatch: true
+cloudwatch_namespace: "SockShop/Custom"
+
+# Security
+# Sensitive values should go in Ansible Vault
+# ansible-vault create group_vars/vault.yml
+# vault_db_password: "your_encrypted_password"

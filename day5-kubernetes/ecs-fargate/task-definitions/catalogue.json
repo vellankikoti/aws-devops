@@ -1,0 +1,15 @@
+{
+  "family": "sockshop-catalogue",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "catalogue",
+      "image": "weaveworksdemos/catalogue:0.3.5",
+      "portMappings": [{ "containerPort": 80, "protocol": "tcp" }],
+      "essential": true
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "family": "sockshop-front-end",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "front-end",
+      "image": "weaveworksdemos/front-end:0.3.12",
+      "portMappings": [{ "containerPort": 8079, "protocol": "tcp" }],
+      "essential": true,
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/sockshop",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "front-end"
+        }
+      }
+    }
+  ]
+}

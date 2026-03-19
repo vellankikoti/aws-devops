@@ -1,0 +1,30 @@
+---
+- name: Download CloudWatch Agent
+  get_url:
+    url: "{{ cloudwatch_agent_url }}"
+    dest: /tmp/amazon-cloudwatch-agent.rpm
+
+- name: Install CloudWatch Agent
+  yum:
+    name: /tmp/amazon-cloudwatch-agent.rpm
+    state: present
+
+- name: Deploy CloudWatch configuration
+  template:
+    src: cloudwatch-config.json.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+  notify: restart cloudwatch agent
+
+- name: Start CloudWatch Agent
+  command: >
+    /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+    -a fetch-config -m ec2
+    -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+  changed_when: false
+
+handlers:
+  - name: restart cloudwatch agent
+    command: >
+      /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+      -a fetch-config -m ec2
+      -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s

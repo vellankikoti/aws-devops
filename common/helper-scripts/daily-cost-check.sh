@@ -1,0 +1,10 @@
+#!/bin/bash
+echo "=== Daily AWS Cost Check ==="
+echo "Date: $(date)"
+echo ""
+echo "Running instances: $(aws ec2 describe-instances --filters 'Name=instance-state-name,Values=running' --query 'Reservations[*].Instances[*].[InstanceId,InstanceType]' --output text 2>/dev/null | wc -l)"
+echo "RDS instances: $(aws rds describe-db-instances --query 'DBInstances[*].DBInstanceIdentifier' --output text 2>/dev/null | wc -w)"
+echo "Load balancers: $(aws elbv2 describe-load-balancers --query 'LoadBalancers[*].LoadBalancerName' --output text 2>/dev/null | wc -w)"
+echo "EKS clusters: $(aws eks list-clusters --query 'clusters' --output text 2>/dev/null | wc -w)"
+echo ""
+echo "Tip: Run cost-optimization/cost-analysis.sh for detailed costs"

@@ -1,0 +1,16 @@
+pipeline-stage-view
+git
+github
+credentials-binding
+aws-credentials
+terraform
+ansible
+slack
+blueocean
+docker-workflow
+pipeline-utility-steps
+configuration-as-code
+job-dsl
+ssh-agent
+timestamper
+ws-cleanup

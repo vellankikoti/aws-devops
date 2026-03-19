@@ -1,0 +1,5 @@
+---
+# Webserver-specific variables
+server_role: application
+enable_docker: true
+enable_monitoring: true

@@ -1,0 +1,26 @@
+# Day 4: CI/CD Pipeline Architecture
+
+```
+┌─────────┐    ┌──────────────────────────────────────────────────┐
+│ GitHub   │───▶│                Jenkins Server                    │
+│ Webhook  │    │                                                  │
+└─────────┘    │  ┌──────┐  ┌──────┐  ┌──────┐  ┌──────┐         │
+               │  │Check │→│  TF  │→│Ansible│→│Health│→ Notify  │
+               │  │ out  │  │Apply │  │Config │  │Check │         │
+               │  └──────┘  └──────┘  └──────┘  └──────┘         │
+               └──────────────────────────────────────────────────┘
+                      │          │          │
+                      ▼          ▼          ▼
+               ┌──────────────────────────────────┐
+               │         AWS Infrastructure        │
+               │  VPC → EC2 → Docker → Sock Shop  │
+               └──────────────────────────────────┘
+```
+
+## Pipeline Stages Flow
+
+```
+Checkout → TF Plan → [Approval] → TF Apply → Ansible → Health Check → Notify
+                         ↑
+                    (prod only)
+```

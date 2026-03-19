@@ -1,0 +1,16 @@
+{
+  "services": [
+    {
+      "serviceName": "front-end",
+      "taskDefinition": "sockshop-front-end",
+      "desiredCount": 2,
+      "launchType": "FARGATE"
+    },
+    {
+      "serviceName": "catalogue",
+      "taskDefinition": "sockshop-catalogue",
+      "desiredCount": 1,
+      "launchType": "FARGATE"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "dashboard": {
+    "title": "Node Metrics",
+    "panels": [
+      { "title": "CPU Usage", "type": "timeseries", "targets": [{ "expr": "100 - (avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])) * 100)" }] },
+      { "title": "Memory Usage", "type": "timeseries", "targets": [{ "expr": "node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes" }] },
+      { "title": "Disk Usage", "type": "gauge", "targets": [{ "expr": "100 - ((node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100)" }] }
+    ]
+  }
+}
